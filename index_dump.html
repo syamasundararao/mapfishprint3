@@ -1,0 +1,67 @@
+ <head>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
+   integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
+   crossorigin=""/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.3.1/css/ol.css" type="text/css">
+    <style>
+      .map {
+        height: 400px;
+        width: 100%;
+      }
+	  #mapid { height: 180px; }
+    </style>
+    <script src="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.3.1/build/ol.js"></script>
+   <!-- Make sure you put this AFTER Leaflet's CSS -->
+ <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"
+   integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=="
+   crossorigin=""></script>
+	<title>OpenLayers example</title>
+  </head>
+<div id="map"></div>    
+<a id="export-pdf"><span id="button-label" class="btn btn-info"> Export(pdf)</span></a>
+
+<script>
+
+ var URL = 'http://localhost:9090/geoserver/test/wms';
+ var centerpos = [78.96, 20.59];
+ var newpos = ol.proj.transform(centerpos, 'EPSG:4326', 'EPSG:900913');
+
+ var baseLayer = new ol.layer.Tile({
+  projection : projection1,
+  source: new ol.source.OSM(),
+  isBaseLayer: true 
+ });
+
+ var projection1 = new ol.proj.Projection({
+  code: 'EPSG:4326',
+  units: 'degrees',
+  axisOrientation: 'neu'
+ });
+
+ var Nepal = new ol.layer.Tile({
+   visible: true,
+   label:'tiger',
+   source: new ol.source.TileWMS({
+     projection : projection1,
+     url: URL,          
+     params: {
+        LAYERS: 'test:IND_water_areas'
+     },
+     serverType: 'geoserver'
+   }),
+   name: 'tiger',
+     isBaseLayer: false
+   });
+
+ var map = new ol.Map({
+   layers: [baseLayer, Nepal],
+   target: 'map',
+   view: new ol.View({
+     center : newpos,
+     zoom: 4
+   })
+ });
+</script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script src ='mapprint.js'></script>
+ 

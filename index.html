@@ -1,0 +1,83 @@
+ <head>
+  
+	<style>
+      .map {
+        height: 400px;
+        width: 100%;
+      }
+	  #mapid { height: 180px; }
+    </style>
+ <title>Leaflet raster boundary plugin example (using drawing plugin)</title>
+
+    <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.css" />
+    <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/0.2.3/leaflet.draw.css" />
+
+    <script src="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.js"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/0.2.3/leaflet.draw.js"></script>
+
+    <script src="BoundaryCanvas.js"></script>
+   
+	
+  </head>
+<div id="map" style="width: 100%; height: 500px;"></div>    
+<a id="export-pdf"><span id="button-label" class="btn btn-info"> Export(pdf)</span></a>
+
+<script>
+
+ var URL = 'http://localhost:9090/geoserver/test/wms';
+ var baseURL='https://bhuvan-vec1.nrsc.gov.in/bhuvan/gwc/service/wms'
+ var centerpos = [20.59,85.78];
+ //var newpos = ol.proj.transform(centerpos, 'EPSG:4326', 'EPSG:900913');
+ var india = L.tileLayer.wms(URL, {layers:'test:IND_rails',opacity:1.0,transparent:true})
+ var adm=L.tileLayer.wms(URL, {layers:'test:IND_adm2',opacity:1.0,transparent:true})
+ var water=L.tileLayer.wms(URL,{layers:'test:IND_water_areas',opacity:1.0,transparent:true})
+
+    L.drawLocal.draw.toolbar.buttons.polygon = L.drawLocal.draw.toolbar.buttons.rectangle = 'Draw layer boundary';
+
+    var drawControl = new L.Control.Draw({
+        draw: {
+            position: 'topright',
+            marker: null,
+            polyline: null,
+            circle: null,
+            polygon: {
+                allowIntersection: false,
+                drawError: {
+                    color: '#b00b00',
+                    timeout: 1000
+                },
+                shapeOptions: {
+                    color: '#bada55'
+                }
+            }
+        },
+        edit: false
+    });
+
+   
+ var baseMaps = {
+    "Map": adm,
+    "border":india
+};
+
+var overlayMaps = {
+    "water": water
+};
+ var map = L.map('map', {
+    crs: L.CRS.EPSG4326
+}).setView(centerpos,3);
+ map.addControl(drawControl);
+L.control.layers(baseMaps, overlayMaps).addTo(map);
+
+var wmsLayer = L.tileLayer.wms(URL, {
+    layers: 'adm'
+}).addTo(map);
+ map.on('draw:created', function (e) {
+		console.log(e.layerType)
+		console.log(e.layer.toGeoJSON())
+        map.addLayer(e.layer)
+    });
+</script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script src ='mapprint.js'></script>
+ 
